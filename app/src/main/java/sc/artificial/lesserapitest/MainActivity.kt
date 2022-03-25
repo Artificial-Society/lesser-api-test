@@ -6,9 +6,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
 
-import sc.artificial.lessersdk.databinding.ActivityMainBinding
-import sc.artificial.lessersdk.gaze.GazeAnalysisManager
-
 // CUSTOM LIBRARY TEST
 import sc.artificial.lesserapi.permissions.PermissionControl
 import sc.artificial.lesserapi.camera.GazeAnalysisDelegate
