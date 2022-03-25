@@ -1,44 +1,66 @@
 package sc.artificial.lesserapitest
 
-import android.content.res.AssetManager
-import android.graphics.BitmapFactory
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.PointF
 import android.os.Bundle
-import sc.artificial.lesserapi.camera.GazeAnalysisDelegate
-import sc.artificial.lesserapi.camera.GazeBitmapAnalysisManager
-import sc.artificial.lesserapi.camera.GazeBitmapAnalysisType
-import sc.artificial.lesserapi.camera.GazeBitmapAnalyzer
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
+
+import sc.artificial.lessersdk.databinding.ActivityMainBinding
+import sc.artificial.lessersdk.gaze.GazeAnalysisManager
+
+// CUSTOM LIBRARY TEST
 import sc.artificial.lesserapi.permissions.PermissionControl
+import sc.artificial.lesserapi.camera.GazeAnalysisDelegate
+import sc.artificial.lesserapi.gaze.GazeAnalysisType
 import sc.artificial.lesserapitest.databinding.ActivityMainBinding
+import sc.artificial.lesserapitest.gaze.GazeAnalysisManager
+
 
 class MainActivity : AppCompatActivity(), GazeAnalysisDelegate {
+
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // CameraX를 이용하는 경우
         if (PermissionControl.checkAndGetPermissions(this)) {
-            GazeBitmapAnalysisManager.initAnalyzer(this, arrayOf(GazeBitmapAnalysisType.concentraiton, GazeBitmapAnalysisType.gaze))
+            GazeAnalysisManager.initAnalyzer(this, arrayOf(GazeAnalysisType.concentraiton, GazeAnalysisType.gaze))
         }
-        GazeBitmapAnalysisManager.bindCamera(this)
-
-        // CameraX가 아닌 Camera2등을 사용하는 경우 Bitmap을 얻어와 다음을 참고해 사용 - Bitmap Analyze
-        // Local Image Test Code
-        /*
-        val assetManager: AssetManager = this.assets
-        try {
-            val inputStream = assetManager.open("test.png")
-            val rawBitmap = BitmapFactory.decodeStream(inputStream, null, null)!!
-
-            GazeBitmapAnalyzer(this, this, arrayOf(GazeBitmapAnalysisType.concentraiton, GazeBitmapAnalysisType.gaze))
-                .bitmapAnalyze(rawBitmap) // Local Image가 아닌 카메라를 통해 얻은 Bitmap인 경우, rawBitmap대신 현재 카메라를 통해 얻은 Bitmap 삽입
-            inputStream.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        */
+        GazeAnalysisManager.bindCamera(this)
     }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == PermissionControl.REQUEST_CODE_PERMISSIONS) {
+            GazeAnalysisManager.initAnalyzer(this, arrayOf(GazeAnalysisType.concentraiton, GazeAnalysisType.gaze))
+        }
+        else {
+            Toast.makeText(this, "Permissions not granted by the user", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun handleConcentration(isConcentrating: Boolean, timestamp: Long) {
+//        super.handleConcentration(isConcentrating, timestamp)
+        // Do something
+        Log.d("GAZE-RESULT", "isConcentrating: ${isConcentrating}")
+    }
+
+    override fun handleGazePoint(gazePoint: PointF, timestamp: Long) {
+//        super.handleGazePoint(gazePoint, timestamp)
+        // Do something
+        Log.d("GAZE-RESULT", "x: ${gazePoint.x}, y: ${gazePoint.y}")
+    }
+
+
+
 }
